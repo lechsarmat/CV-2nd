@@ -69,8 +69,8 @@ def LearningAlg(seq0, seq1):
 
 def Classifier(seq0, seq1, seq2):
     """Classifies given data.
-       >>> Classifier(np.array([[-0.5, 0.],[0.5, 0.]]), np.array([[0., 0.]]), np.array([[0., -1.],[0., 0.5]]))
-       array([[0]], dtype=int64)
+       >>> Classifier(np.array([[-0.5, 0.],[0.5, 0.]]), np.array([[0., 0.]]), np.array([[0., -1.],[0., 0.5]]))[0][0]
+       0
        >>> Classifier(0, 0, 0)
        Traceback (most recent call last):
         ...
