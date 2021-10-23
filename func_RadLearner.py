@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.patches import Ellipse
 
 def DataTransformation(df):
     """Converts pandas dataframe into two numpy arrays.
@@ -93,3 +95,52 @@ def Classifier(seq0, seq1, seq2):
                         * np.array([seq2.T[1]]).T, np.array([seq2.T[1]]).T ** 2), axis = 1)
     y = (np.dot(Y,W) > 0)
     return np.argwhere(y == 0)
+
+def DrawGraph(seq0, seq1, seq2 = np.array([])):
+    """Displays classification of given data.
+       >>> DrawGraph(0, 0)
+       Traceback (most recent call last):
+        ...
+       TypeError: seq0, seq1 and seq2 must be numpy array
+       >>> DrawGraph(np.array([[0.5, 'a']]), np.array([[0., 0.]]))
+       Traceback (most recent call last):
+        ...
+       TypeError: wrong type of elements
+       >>> DrawGraph(np.array([[0.5, 0.]]), np.array([[0., 0., 0.]]))
+       Traceback (most recent call last):
+        ...
+       ValueError: wrong shape of seq0, seq1 or seq2
+    """
+    if type(seq0) != np.ndarray or type(seq1) != np.ndarray or type(seq2) != np.ndarray:
+        raise TypeError( "seq0, seq1 and seq2 must be numpy array" )
+    if seq0.dtype != 'float64' or seq1.dtype != 'float64' or seq2.dtype != 'float64':
+        raise TypeError( "wrong type of elements" )
+    if seq0.shape[1] != 2 or seq1.shape[1] != 2 or (np.prod(seq2.shape)/(len(seq2) + (len(seq2) == 0)) != 2
+            and np.prod(seq2.shape)/(len(seq2) + (len(seq2) == 0)) != 0):
+        raise ValueError( "wrong shape of seq0, seq1 or seq2" )
+    fig = plt.figure(figsize = (16,9))
+    with plt.style.context('seaborn'):
+        ax1 = fig.add_subplot(111)
+    ax1.set_title('Results', fontsize = 24)
+    ax1.scatter(seq0.T[0], seq0.T[1], color = '#708090', label = 'Class 0')
+    ax1.scatter(seq1.T[0], seq1.T[1], color = '#FF6347', label = 'Class 1')
+    ax1.legend(loc = 'lower right', fontsize = 16)
+    ax1.tick_params(labelsize = 16)
+    W = LearningAlg(seq0, seq1)
+    InvSigma = np.array([[-2 * W[3], -W[4]], [-W[4], -2 * W[5]]])
+    mu = np.matmul(np.linalg.inv(InvSigma), np.array([W[1], W[2]]))
+    eigval, eigvec = np.linalg.eig(np.linalg.inv(InvSigma))
+    HW = 2 * np.sqrt(np.dot(np.matmul(InvSigma, mu), mu) + 2 * W[0]) * np.sqrt(eigval)
+    ang = np.degrees(np.arccos(np.dot(eigvec.T[0], np.array([1, 0])) / np.linalg.norm(eigvec.T[0])))
+    ax1.add_artist(Ellipse((mu[0], mu[1]), HW[0], HW[1], ang, facecolor = 'none', edgecolor = '#DC143C'))
+    if len(seq2) != 0:
+        Y = np.concatenate((np.ones((len(seq2),1)), seq2, np.array([seq2.T[0]]).T ** 2, np.array([seq2.T[0]]).T
+                            * np.array([seq2.T[1]]).T, np.array([seq2.T[1]]).T ** 2), axis = 1)
+        y = (np.dot(Y, W) > 0)
+        for i in range(len(y)):
+            if not y[i]:
+                ax1.scatter(seq2.T[0][i], seq2.T[1][i], facecolors = 'none', edgecolors = '#708090')
+            else:
+                ax1.scatter(seq2.T[0][i], seq2.T[1][i], facecolors = 'none', edgecolors = '#FF6347')
+            ax1.annotate(str(i), (seq2.T[0][i], seq2.T[1][i]), (seq2.T[0][i] + 0.007, seq2.T[1][i] + 0.007))
+    plt.show()
