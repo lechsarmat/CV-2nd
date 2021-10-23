@@ -146,6 +146,6 @@ def DrawGraph(seq0, seq1, seq2 = np.array([])):
     plt.show()
 
 
-    if __name__ == "__main__":
-        import doctest
-        doctest.testmod()
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
