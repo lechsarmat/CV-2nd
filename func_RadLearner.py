@@ -144,3 +144,8 @@ def DrawGraph(seq0, seq1, seq2 = np.array([])):
                 ax1.scatter(seq2.T[0][i], seq2.T[1][i], facecolors = 'none', edgecolors = '#FF6347')
             ax1.annotate(str(i), (seq2.T[0][i], seq2.T[1][i]), (seq2.T[0][i] + 0.007, seq2.T[1][i] + 0.007))
     plt.show()
+
+
+    if __name__ == "__main__":
+        import doctest
+        doctest.testmod()
