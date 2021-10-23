@@ -64,3 +64,32 @@ def LearningAlg(seq0, seq1):
         else:
             break
     return W
+
+def Classifier(seq0, seq1, seq2):
+    """Classifies given data.
+       >>> Classifier(np.array([[-0.5, 0.],[0.5, 0.]]), np.array([[0., 0.]]), np.array([[0., -1.],[0., 0.5]]))
+       array([[0]], dtype=int64)
+       >>> Classifier(0, 0, 0)
+       Traceback (most recent call last):
+        ...
+       TypeError: seq0, seq1 and seq2 must be numpy array
+       >>> Classifier(np.array([[0.5, 'a']]), np.array([[0., 0.]]), np.array([[0., 0.5]]))
+       Traceback (most recent call last):
+        ...
+       TypeError: wrong type of elements
+       >>> Classifier(np.array([[0.5, 0.]]), np.array([[0., 0., 0.]]), np.array([[0., 0.5]]))
+       Traceback (most recent call last):
+        ...
+       ValueError: wrong shape of seq0, seq1 or seq2
+    """
+    if type(seq0) != np.ndarray or type(seq1) != np.ndarray or type(seq2) != np.ndarray:
+        raise TypeError( "seq0, seq1 and seq2 must be numpy array" )
+    if seq0.dtype != 'float64' or seq1.dtype != 'float64' or seq2.dtype != 'float64':
+        raise TypeError( "wrong type of elements" )
+    if seq0.shape[1] != 2 or seq1.shape[1] != 2 or seq2.shape[1] != 2:
+        raise ValueError( "wrong shape of seq0, seq1 or seq2" )
+    W = LearningAlg(seq0, seq1)
+    Y = np.concatenate((np.ones((len(seq2),1)), seq2, np.array([seq2.T[0]]).T ** 2, np.array([seq2.T[0]]).T
+                        * np.array([seq2.T[1]]).T, np.array([seq2.T[1]]).T ** 2), axis = 1)
+    y = (np.dot(Y,W) > 0)
+    return np.argwhere(y == 0)
